@@ -113,7 +113,7 @@
       
       // Nota: Non inviamo più pranzo/cena
 
-      fetch("https://script.google.com/a/macros/issanpellegrino.edu.it/s/AKfycbyW6p2Ke1q95vUHqa9w84Mk8rmpokUFlSGh_XUQ5eJ0lN489fBolJstPxVor7it2cgF/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbx1eGKWi5ARnATtdjCAU3DivptTkGjrA72kIa0jUHzVkmNFSNhc1V3Tn73DHKRRWYoj/exec", {
         method: "POST",
         body: formData
       })
@@ -152,7 +152,7 @@
     document.getElementById("btnPDF").addEventListener("click", () => {
       const mese = document.getElementById("mese").value;
       const anno = document.getElementById("anno").value;
-      const scriptUrl = "https://script.google.com/a/macros/issanpellegrino.edu.it/s/AKfycbyW6p2Ke1q95vUHqa9w84Mk8rmpokUFlSGh_XUQ5eJ0lN489fBolJstPxVor7it2cgF/exec";
+      const scriptUrl = "https://script.google.com/macros/s/AKfycbx1eGKWi5ARnATtdjCAU3DivptTkGjrA72kIa0jUHzVkmNFSNhc1V3Tn73DHKRRWYoj/exec";
       window.open(`${scriptUrl}?mese=${encodeURIComponent(mese)}&anno=${encodeURIComponent(anno)}`, "_blank");
     });
   </script>
