@@ -2,56 +2,42 @@
 <html lang="it">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ore Lavoro Sofia</title>
-<link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App Cristiana</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
 </head>
 
 <body>
   <h1>Rilevazione Orari Sofia</h1>
   <div id="ultimoOrario">Ultimo orario inserito: Caricamento...</div>
 
-  <form id="mealForm">
-    <label>Data ingresso
-      <input type="date" id="dataIngresso" name="dataIngresso" placeholder="Data entrata" required>
+  <form id="workForm">
+    <label>Data
+      <input type="date" id="dataIngresso" name="dataIngresso" required>
     </label>
 
     <label>Ora entrata
-      <div class="suggestions" id="entrataSuggerimenti">
-        <span data-target="oraEntrata" data-time="07:00">07:00</span>
-        <span data-target="oraEntrata" data-time="09:30">09:30</span>
-        <span data-target="oraEntrata" data-time="12:00">12:00</span>
-        <span data-target="oraEntrata" data-time="16:00">16:00</span>
-      </div>
-      <input type="time" id="oraEntrata" name="oraEntrata" placeholder="Ora entrata" required>
+      <input type="time" id="oraEntrata" name="oraEntrata" required>
     </label>
 
     <label>Ora uscita
-      <div class="suggestions" id="uscitaSuggerimenti">
-        <span data-target="oraUscita" data-time="22:00">22:00</span>
-        <span data-target="oraUscita" data-time="22:30">22:30</span>
-        <span data-target="oraUscita" data-time="23:00">23:00</span>
-        <span data-target="oraUscita" data-time="23:30">23:30</span>
-      </div>
-      <input type="time" id="oraUscita" name="oraUscita" placeholder="Ora uscita" required>
+      <input type="time" id="oraUscita" name="oraUscita" required>
     </label>
 
-    <label>Hai Mangiato?
-      <div class="centered">
-        <span id="btnPranzo" class="checkbox-btn" style="margin-right: 6px;">Pranzo</span>
-        <span id="btnCena" class="checkbox-btn" style="margin-left: 6px;">Cena</span>
-      </div>
+    <label>Motivazione
+      <input type="text" id="motivazione" name="motivazione" placeholder="Es. Lavoro ordinario, Straordinari..." required style="width: 100%; padding: 10px; margin-top:5px; box-sizing: border-box;">
     </label>
+
     <button type="button" id="btnInvia">Invia</button>
   </form>
 
   <p id="status"></p>
 
-  <!-- PDF -->
-  <!-- Sezione Stampa PDF -->
   <div class="pdf-section">
+    <hr>
+    <h3>Stampa Mensile</h3>
     <label>Mese:
       <select id="mese">
         <option value="Gennaio">Gennaio</option>
@@ -79,34 +65,11 @@
     <button type="button" id="btnPDF">Stampa PDF</button>
   </div>
 
-
   <script>
     const status = document.getElementById("status");
-    const btnPranzo = document.getElementById("btnPranzo");
-    const btnCena = document.getElementById("btnCena");
-    let pranzo = false;
-    let cena = false;
+    const ultimoOrario = document.getElementById("ultimoOrario");
 
-    // toggle pranzo/cena
-    btnPranzo.addEventListener("click", () => {
-      pranzo = !pranzo;
-      btnPranzo.classList.toggle("active", pranzo);
-    });
-    btnCena.addEventListener("click", () => {
-      cena = !cena;
-      btnCena.classList.toggle("active", cena);
-    });
-
-    // suggerimenti orari
-    document.querySelectorAll(".suggestions span").forEach(span => {
-      span.addEventListener("click", () => {
-        const targetId = span.dataset.target;
-        const time = span.dataset.time;
-        document.getElementById(targetId).value = time;
-      });
-    });
-
-    // setta automaticamente la data odierna
+    // --- 1. Setta automaticamente la data odierna all'avvio ---
     window.addEventListener("DOMContentLoaded", () => {
       const today = new Date();
       const yyyy = today.getFullYear();
@@ -117,36 +80,38 @@
       document.getElementById("dataIngresso").value = `${yyyy}-${mm}-${dd}`;
     });
 
-    // All'inizio, crea un riferimento alla scritta "Ultimo orario inserito"
-    const ultimoOrario = document.getElementById("ultimoOrario");
-
-    // --- Mostra subito l'ultimo inserimento salvato in locale ---
+    // --- 2. Mostra l'ultimo inserimento salvato in memoria locale ---
     window.addEventListener("DOMContentLoaded", () => {
       const ultimo = localStorage.getItem("ultimoOrario");
       if (ultimo) {
-        ultimoOrario.textContent = "Ultimo orario inserito: " + ultimo;
+        ultimoOrario.textContent = "Ultimo inserimento: " + ultimo;
       } else {
-        ultimoOrario.textContent = "Ultimo orario inserito: Caricamento...";
+        ultimoOrario.textContent = "Nessun inserimento recente.";
       }
     });
 
-    // invio dati
+    // --- 3. Invio Dati ---
     document.getElementById("btnInvia").addEventListener("click", () => {
+      const dataIngresso = document.getElementById("dataIngresso").value;
       const oraEntrata = document.getElementById("oraEntrata").value;
       const oraUscita = document.getElementById("oraUscita").value;
+      const motivazione = document.getElementById("motivazione").value;
 
-      // --- CONTROLLO OBBLIGO ORARI ---
-      if (!oraEntrata || !oraUscita) {
-        status.textContent = "❌ Inserisci sia l'orario di entrata che di uscita!";
-        return; // blocca l'invio
+      // Controlli di validità
+      if (!dataIngresso || !oraEntrata || !oraUscita || !motivazione) {
+        status.textContent = "❌ Compila tutti i campi (Data, Orari e Motivazione).";
+        return;
       }
 
+      status.textContent = "⏳ Invio in corso...";
+
       const formData = new FormData();
-      formData.append("dataIngresso", document.getElementById("dataIngresso").value);
-      formData.append("oraEntrata", document.getElementById("oraEntrata").value);
-      formData.append("oraUscita", document.getElementById("oraUscita").value);
-      formData.append("pranzo", pranzo);
-      formData.append("cena", cena);
+      formData.append("dataIngresso", dataIngresso);
+      formData.append("oraEntrata", oraEntrata);
+      formData.append("oraUscita", oraUscita);
+      formData.append("motivazione", motivazione);
+      
+      // Nota: Non inviamo più pranzo/cena
 
       fetch("https://script.google.com/macros/s/AKfycbx4DXbptx4wNr8Ez_ybrLkOVnloCSZ-j3Ae0aBuJrwQtsAWm1C3IglMNGQKRLThEIt3/exec", {
         method: "POST",
@@ -155,12 +120,12 @@
         .then(r => r.json())
         .then(res => {
           if (res.success) {
-            status.textContent = "✅ Dati salvati nel foglio " + res.sheet;
-            pranzo = false; cena = false;
-            btnPranzo.classList.remove("active");
-            btnCena.classList.remove("active");
-            document.getElementById("mealForm").reset();
-            // reset data a oggi
+            status.textContent = "✅ Salvato!";
+            
+            // Reset del form
+            document.getElementById("workForm").reset();
+            
+            // Rimetto la data di oggi dopo il reset
             const today = new Date();
             const yyyy = today.getFullYear();
             let mm = today.getMonth() + 1;
@@ -169,33 +134,27 @@
             if (dd < 10) dd = "0" + dd;
             document.getElementById("dataIngresso").value = `${yyyy}-${mm}-${dd}`;
 
-            // --- SALVA IN LOCALE LA DATA INSERITA ---
-            const dataInserita = document.getElementById("dataIngresso").value;
-            const dataLocale = new Date(dataInserita);
-            const giornoFormattato = dataLocale.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
-            localStorage.setItem("ultimoOrario", giornoFormattato);
-
-            // --- AGGIORNA LA SCRITTA ---
-            ultimoOrario.textContent = "Ultimo orario inserito: " + giornoFormattato;
+            // Aggiorno memoria locale
+            const info = `${dataIngresso} (${motivazione})`;
+            localStorage.setItem("ultimoOrario", info);
+            ultimoOrario.textContent = "Ultimo inserimento: " + info;
 
           } else {
-            status.textContent = "❌ Errore: " + res.error;
+            status.textContent = "❌ Errore Google: " + res.error;
           }
         })
         .catch(err => {
-          status.textContent = "❌ Errore di rete: " + err.message;
+          status.textContent = "❌ Errore connessione: " + err.message;
         });
     });
 
-    //scarica il pDF
+    // --- 4. Stampa PDF ---
     document.getElementById("btnPDF").addEventListener("click", () => {
       const mese = document.getElementById("mese").value;
       const anno = document.getElementById("anno").value;
       const scriptUrl = "https://script.google.com/macros/s/AKfycbx4DXbptx4wNr8Ez_ybrLkOVnloCSZ-j3Ae0aBuJrwQtsAWm1C3IglMNGQKRLThEIt3/exec";
       window.open(`${scriptUrl}?mese=${encodeURIComponent(mese)}&anno=${encodeURIComponent(anno)}`, "_blank");
     });
-
   </script>
 </body>
-
 </html>
