@@ -46,7 +46,7 @@
       
       // Nota: Non inviamo più pranzo/cena
 
-      fetch("https://script.google.com/macros/s/AKfycbz_kIoeUhGZXhMtb32FfQ7oYZeAWgFVcV1y2wPPQE4Eyznhgpd9A7pCQYKnh1zeZz68/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbz3Z16dOgiA0RldJuniD30LxnLoMk5wDKyvvZewXW4xWD_ZwRUxvx7KW95qGQWcl1Hj/exec", {
         method: "POST",
         body: formData
       })
@@ -85,6 +85,6 @@
     document.getElementById("btnPDF").addEventListener("click", () => {
       const mese = document.getElementById("mese").value;
       const anno = document.getElementById("anno").value;
-      const scriptUrl = "https://script.google.com/macros/s/AKfycbz_kIoeUhGZXhMtb32FfQ7oYZeAWgFVcV1y2wPPQE4Eyznhgpd9A7pCQYKnh1zeZz68/exec";
+      const scriptUrl = "https://script.google.com/macros/s/AKfycbz3Z16dOgiA0RldJuniD30LxnLoMk5wDKyvvZewXW4xWD_ZwRUxvx7KW95qGQWcl1Hj/exec";
       window.open(`${scriptUrl}?mese=${encodeURIComponent(mese)}&anno=${encodeURIComponent(anno)}`, "_blank");
     });
